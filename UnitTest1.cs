@@ -129,4 +129,16 @@ public class Tests : PageTest
     // URL kontrolü
     await Expect(Page).ToHaveURLAsync("https://www.saucedemo.com/checkout-step-two.html");
     }
+
+    [Test]
+    public async Task Price_Low_To_High()
+    {
+
+        await _loginPage.LoginAsync("standard_user", "secret_sauce");
+        // Sırala dropdown'ını tıkla
+        await Page.SelectOptionAsync(".product_sort_container", "lohi");
+        // İlk ürünün fiyatını al
+        var ilkUrun = await Page.Locator(".inventory_item_name").First.TextContentAsync();
+        Assert.That(ilkUrun, Is.EqualTo("Sauce Labs Onesie"));
+    }
 }
