@@ -141,4 +141,46 @@ public class Tests : PageTest
         var ilkUrun = await Page.Locator(".inventory_item_name").First.TextContentAsync();
         Assert.That(ilkUrun, Is.EqualTo("Sauce Labs Onesie"));
     }
+
+
+    [Test]
+    public async Task Login_BosKullaniciAdi_HataMesajiGelmeli()
+    {
+    // Boş username, boş password
+    await _loginPage.LoginAsync("", "");
+    var hata = await _loginPage.HataMesajiAsync();
+    Assert.That(hata, Does.Contain("Username is required"));
+    }
+
+    [Test]
+    public async Task Login_BosSifre_HataMesajiGelmeli()
+    {
+    // Sadece şifre boş
+    await _loginPage.LoginAsync("standard_user", "");
+    var hata = await _loginPage.HataMesajiAsync();
+    Assert.That(hata, Does.Contain("Password is required"));
+    }
+
+
+    [Test]
+    public async Task Login_CokUzunKullaniciAdi_HataMesajiGelmeli()
+    {
+    // 500 karakterlik kullanıcı adı
+    var uzunInput = new string('a', 500);
+    await _loginPage.LoginAsync(uzunInput, "secret_sauce");
+    var hata = await _loginPage.HataMesajiAsync();
+    Assert.That(hata, Does.Contain("Username and password do not match"));
+    }
+
+    
+    [Test]
+    public async Task Login_OzelKarakter_HataMesajiGelmeli()
+    {
+    // SQL injection denemesi gibi özel karakterler
+    await _loginPage.LoginAsync("' OR '1'='1", "' OR '1'='1");
+    var hata = await _loginPage.HataMesajiAsync();
+    Assert.That(hata, Does.Contain("Username and password do not match"));
+    }
+
+
 }
